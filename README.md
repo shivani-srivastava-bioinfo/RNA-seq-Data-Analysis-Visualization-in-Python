@@ -20,17 +20,17 @@ This is my Python-based downstream analysis for RNA-seq data- I take the gene co
 
 pandas, numpy, matplotlib, seaborn, scikit-learn, and scipy are all **Python libraries** (also called **packages**)- not built into plain Python, they're separate collections of pre-written code that I install (`pip install ...`) and then `import` to add specific functionality like data tables, math, plotting, or statistics.
 
-- **pandas**– a Python library for working with tables of data (rows and columns), similar to Excel but inside code. I use it to load my `count_matrix.csv` file, look at rows/columns, calculate averages, and filter genes based on conditions.
+- **pandas**- a Python library for working with tables of data (rows and columns), similar to Excel but inside code. I use it to load my `count_matrix.csv` file, look at rows/columns, calculate averages, and filter genes based on conditions.
 
-- **numpy** – a library for doing math on large sets of numbers quickly. I use it mainly for the log2 transform (`np.log2()`), which compresses very large and very small expression numbers so they're easier to compare and plot.
+- **numpy**- a library for doing math on large sets of numbers quickly. I use it mainly for the log2 transform (`np.log2()`), which compresses very large and very small expression numbers so they're easier to compare and plot.
 
-- **matplotlib** – the base Python library for making plots and charts (lines, scatter plots, titles, axis labels, etc.). Most other plotting libraries, including seaborn, are actually built on top of it. I use it directly for the volcano plot and PCA plot, and to control titles/labels/saving on all my figures.
+- **matplotlib**- the base Python library for making plots and charts (lines, scatter plots, titles, axis labels, etc.). Most other plotting libraries, including seaborn, are actually built on top of it. I use it directly for the volcano plot and PCA plot, and to control titles/labels/saving on all my figures.
 
-- **seaborn** – built on top of matplotlib, but makes certain plots (like heatmaps and violin plots) much easier to create with nicer default styling. I use it for the heatmap and the violin plot.
+- **seaborn**- built on top of matplotlib, but makes certain plots (like heatmaps and violin plots) much easier to create with nicer default styling. I use it for the heatmap and the violin plot.
 
-- **scikit-learn (sklearn)** – a machine learning library. I don't use it for machine learning here- just two of its tools: `StandardScaler` (which rescales all genes so they're on a comparable scale before PCA) and `PCA` (Principal Component Analysis, which reduces complex gene expression data down to 2 dimensions so I can plot and see how similar or different my samples are).
+- **scikit-learn (sklearn)**- a machine learning library. I don't use it for machine learning here- just two of its tools: `StandardScaler` (which rescales all genes so they're on a comparable scale before PCA) and `PCA` (Principal Component Analysis, which reduces complex gene expression data down to 2 dimensions so I can plot and see how similar or different my samples are).
 
-- **scipy** – a scientific computing library. I use one specific function from it, `ttest_ind`, which runs a t-test- a statistical test that checks whether the average expression of a gene is really different between two groups (Control vs Treated), or if the difference could just be random chance.
+- **scipy**- a scientific computing library. I use one specific function from it, `ttest_ind`, which runs a t-test- a statistical test that checks whether the average expression of a gene is really different between two groups (Control vs Treated), or if the difference could just be random chance.
 
 ## Folder structure
 
@@ -82,7 +82,7 @@ print(sample_counts.mean())
 print(sample_counts.median())
 ```
 
-*Simple explanation: mean/median tells me the average gene expression level in each sample- useful for a quick sanity check (samples with very different averages might need extra normalization).*
+* Mean/Median tells me the average gene expression level in each sample- useful for a quick sanity check (samples with very different averages might need extra normalization).*
 
 > **Bug I fixed:** in my first draft I wrote `sample_counts = counts.iloc[:, 1:]`, which accidentally dropped my first sample column (since `index_col=0` already removes the gene ID column- there's nothing extra left to skip). Fixed by just using `counts` directly, so all 4 samples are included in every step below.
 
@@ -95,7 +95,7 @@ log_counts = np.log2(sample_counts + 1)
 print(log_counts.head())
 ```
 
-*Simple explanation: raw counts can range from 0 to millions, which makes plots hard to read. Log2 transforming compresses that range so patterns are easier to see.*
+* Raw counts can range from 0 to millions, which makes plots hard to read. Log2 transforming compresses that range so patterns are easier to see.*
 
 ## Step 4: Heatmap of gene expression
 
@@ -106,7 +106,7 @@ plt.title("E. coli Heatmap of 50 Genes")
 plt.show()
 ```
 
-*Simple explanation: a heatmap shows expression of many genes across all samples at once, colored by intensity- darker/lighter patches make it easy to spot genes that behave differently between samples.*
+* A heatmap shows expression of many genes across all samples at once, colored by intensity- darker/lighter patches make it easy to spot genes that behave differently between samples.*
 
 ## Step 5: PCA plot- how similar are my samples?
 
@@ -135,7 +135,7 @@ plt.title("E. coli PCA Plot")
 plt.show()
 ```
 
-*Simple explanation: PCA plots each sample as a dot based on its overall gene expression pattern. Samples that are biologically similar (e.g. all the Control samples) should cluster close together, and Treated samples should cluster separately- a good visual check that my experiment worked as expected.*
+* PCA plots each sample as a dot based on its overall gene expression pattern. Samples that are biologically similar (e.g. all the Control samples) should cluster close together, and Treated samples should cluster separately- a good visual check that my experiment worked as expected.*
 
 ## Step 6: Find differentially expressed genes (DEGs) with a t-test
 
@@ -171,7 +171,7 @@ print(deg.head())
 deg.to_csv("DEG_results.csv", index=False)
 ```
 
-*Simple explanation: for every gene, I compare its expression in Control vs Treated samples using a t-test, which tells me if the difference is likely real or just random noise.*
+* For every gene, I compare its expression in Control vs Treated samples using a t-test, which tells me if the difference is likely real or just random noise.*
 
 > **Worth knowing:** with only 2 samples per group, a plain t-test has very little statistical power- it's easy to miss real changes or flag noisy ones. This is exactly why the main pipeline uses **DESeq2** (Step 11 in the main pipeline README) instead of a plain t-test for the "official" DEG list- DESeq2 is built to handle small sample sizes properly. This Python t-test version is a good learning/exploration exercise and quick visual sanity check, but I treat `Significant_DEGs.csv` from DESeq2 as the primary result, not `DEG_results.csv` from this script.
 
@@ -193,7 +193,7 @@ plt.title("Volcano Plot")
 plt.show()
 ```
 
-*Simple explanation: a volcano plot shows every gene at once- how much it changed (x-axis) vs. how significant that change is (y-axis). Genes in the top-left and top-right corners are the most interesting (big change + highly significant).*
+* A volcano plot shows every gene at once- how much it changed (x-axis) vs. how significant that change is (y-axis). Genes in the top-left and top-right corners are the most interesting (big change + highly significant).*
 
 ## Step 8: Violin plot for one specific gene
 
@@ -216,9 +216,8 @@ plt.ylabel("Expression")
 plt.show()
 ```
 
-*Simple explanation: once I have a gene I care about (e.g. from the DEG list), a violin plot shows its exact expression value in every sample, grouped by Control vs Treated- useful for double-checking a specific result visually.*
+* Once I have a gene I care about (e.g. from the DEG list), a violin plot shows its exact expression value in every sample, grouped by Control vs Treated- useful for double-checking a specific result visually.*
 
-> **Note:** with only 2 samples per group, the "violin" shape itself won't show much of a distribution- the black dots (from `stripplot`) are really doing the work here, showing the 2 actual data points per condition.
 
 > **Note:** change `gene = "b0002"` to any gene ID from `DEG_results.csv` that you want to look at closely.
 
@@ -247,7 +246,7 @@ The same pattern (`plt.savefig("<name>.png")` right before `plt.show()`) works f
 
 ## Things to remember if I re-run this
 
-- This script assumes the first 2 sample columns are Control and the next 2 are Treated- if the column order changes, `control`/`treated` slicing in Step 6 needs to be updated too.
+- This script coonsider the first 2 sample columns are Control and the next 2 are Treated- if the column order changes, `control`/`treated` slicing in Step 6 needs to be updated too.
 - Make sure `count_matrix.csv` is in the same folder as the script, or update the path.
 
 ## License
